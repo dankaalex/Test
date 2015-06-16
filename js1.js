@@ -447,5 +447,126 @@ function getSums1(arr) {
 
 // console.log(getSums1(arr));
 
+
 // ************************************ Псевдомассив аргументов «arguments» *******************************
 
+// Проверка на аргумент-undefined
+function f(x) {
+    if (arguments.length > 0) return 1;
+    else return 0;
+}
+
+//console.log(f(undefined)); // 1
+//console.log(f()); // 0
+
+// Сумма аргументов
+function sumArg(){
+    var result =0;
+    for (i=0;i<arguments.length; i++) {result += arguments[i];}
+    return result;
+}
+/*
+console.log(sumArg());
+console.log(sumArg(1));
+console.log(sumArg(1, 2));
+console.log(sumArg(1, 2, 3));
+console.log(sumArg(1, 2, 3, 4));
+*/
+
+// ************************************ Дата и Время *******************************
+
+// Создайте дату
+var dt = new Date (2012,01,20,3,12,0);
+//console.log(dt.toString());
+
+// Имя дня недели
+var date = new Date(2012,0,3);  // 3 января 2012
+function getWeekDay(date) {
+    switch (date.getDay()) {
+        case 1:return 'пн';break;
+        case 2:return 'вт'; break;
+        case 3:return 'ср';break;
+        case 4:return 'чт'; break;
+        case 5:return 'пт';break;
+        case 6:return 'сб';break;
+        case 0:return 'вс';break;
+        default :return 'чё чё';
+    }
+}
+//console.log( getWeekDay(date));      // Должно вывести 'вт'
+
+// День недели в европейской нумерации
+var date = new Date(2012, 0, 3);  // 3 янв 2012
+function getLocalDay(date) {
+    var dayNum = [7,1,2,3,4,5,6];
+    return dayNum[date.getDay()];
+}
+//console.log( getLocalDay(date) );       // вторник, выведет 2
+
+//День указанное количество дней назад
+var date = new Date(2015, 0, 2);
+function getDateAgo(date, days){
+    var date_ = new Date ();
+    date_.setDate(date.getDate()-days);
+   return date_.toString();
+}
+//console.log( getDateAgo(date, 1) ); // 1, (1 января 2015)
+//console.log( getDateAgo(date, 2) ); // 31, (31 декабря 2014)
+//console.log( getDateAgo(date, 365) ); // 2, (2 января 2014)
+
+//Последний день месяца
+function  getLastDayOfMonth(year, month){
+    var date = new Date (year, month +1);
+    date.setDate(date.getDate()-1);
+    return date.toString();
+}
+// console.log(getLastDayOfMonth(2012, 1));
+
+// Сколько секунд уже прошло сегодня?
+function getSecondsToday(){
+    var date_now = new Date;
+    var date_start = new Date(date_now.getFullYear(), date_now.getMonth(), date_now.getDate(), 0,0,0);
+    return (date_now - date_start)/1000;
+}
+//console.log(getSecondsToday());
+
+//Сколько секунд – до завтра
+function getSecondsToTomorrow(){
+    var date_now = new Date;
+    var date_next = new Date(date_now.getFullYear(), date_now.getMonth(), date_now.getDate()+1, 0,0,0);
+    return (date_next - date_now)/1000;
+}
+//console.log(getSecondsToTomorrow());
+
+// Вывести дату в формате дд.мм.гг
+var d = new Date(2014, 0, 1); // 30 января 2014
+function formatDate(d){
+    if  (d.getDate() < 10) return '0'+ d.getDate() + '.' + d.getMonth()+1 + '.'+ d.getFullYear();
+    else return d.getDate() + '.' + d.getMonth()+1 + '.'+ d.getFullYear();
+}
+// console.log( formatDate(d) ); // '30.01.14'
+
+//Относительное форматирование даты
+function formatDate(date) {
+    var date_now = new Date;
+    var diff = (date_now - date)/1000;
+    if (diff < 1) return "только что";
+    else if (diff >= 1 && diff <60) return diff + " сек. назад ";
+    else if (diff >= 60 && diff <60 *60 ) return diff/60 + " мин. назад ";
+    else if (diff >= 60*60 ) {
+      //  return date.toDateString();
+        var options = {
+            year: 'numeric',
+            month: 'numeric',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            second: 'numeric'
+        };
+    return date.toLocaleString("ru",options);
+    }
+}
+console.log( formatDate(new Date(new Date - 1)) ); // "только что"
+console.log( formatDate(new Date(new Date - 30 * 1000)) ); // "30 сек. назад"
+console.log( formatDate(new Date(new Date - 5 * 60 * 1000)) ); // "5 мин. назад"
+console.log( formatDate(new Date(new Date - 86400 * 1000)) ); // вчерашняя дата в формате "дд.мм.гг чч:мм"
