@@ -566,7 +566,128 @@ function formatDate(date) {
     return date.toLocaleString("ru",options);
     }
 }
-console.log( formatDate(new Date(new Date - 1)) ); // "только что"
-console.log( formatDate(new Date(new Date - 30 * 1000)) ); // "30 сек. назад"
-console.log( formatDate(new Date(new Date - 5 * 60 * 1000)) ); // "5 мин. назад"
-console.log( formatDate(new Date(new Date - 86400 * 1000)) ); // вчерашняя дата в формате "дд.мм.гг чч:мм"
+//console.log( formatDate(new Date(new Date - 1)) ); // "только что"
+//console.log( formatDate(new Date(new Date - 30 * 1000)) ); // "30 сек. назад"
+//console.log( formatDate(new Date(new Date - 5 * 60 * 1000)) ); // "5 мин. назад"
+//console.log( formatDate(new Date(new Date - 86400 * 1000)) ); // вчерашняя дата в формате "дд.мм.гг чч:мм"
+
+
+// ************************************ Глобальный объект ********************************
+
+// ************************************ Замыкания, функции изнутри ********************************
+
+// ************************************ [[Scope]] для new Function ********************************
+
+// ************************************ Локальные переменные для объекта ********************************
+//Сумма через замыкание
+function sum (a) {
+    var f1 = function(b) {return a+b;};
+    return f1;
+}
+//console.log(sum(5)(-1));
+
+//Функция – строковый буфер
+
+function makeBuffer() {
+  var NewLine = '';
+    function buffer (str) { if (str != undefined) {NewLine = NewLine + str;} return NewLine;}
+    return buffer;
+}
+
+var buffer = makeBuffer();
+buffer('Замыкания');
+buffer(' Использовать');
+buffer(' Нужно!');
+//console.log( buffer() ); // 'Замыкания Использовать Нужно!'
+
+var buffer2 = makeBuffer();
+buffer2(0);
+buffer2(1);
+buffer2(0);
+//console.log( buffer2() ); // '010'
+
+// Строковый буфер с очисткой
+function makeBuffer() {
+    var NewLine = '';
+    function buffer (str) { if (str != undefined) {NewLine = NewLine + str;} return NewLine;}
+    buffer.clear = function(){NewLine = '';}
+    return buffer;
+}
+
+var buffer = makeBuffer();
+buffer("Тест");
+buffer(" тебя не съест ");
+//console.log( buffer() ); // Тест тебя не съест
+buffer.clear();
+//console.log( buffer() ); // ""
+
+// Сортировка
+var users = [{
+    name: "Вася",
+    surname: 'Иванов',
+    age: 20
+}, {
+    name: "Петя",
+    surname: 'Чапаев',
+    age: 25
+}, {
+    name: "Маша",
+    surname: 'Медведева',
+    age: 18
+}];
+
+function byField(name){
+    var mysort = new Function('a, b',' return a.'+name+' > b.'+name+' ? 1 : -1;');
+    return mysort;
+}
+/*
+users.sort(byField('name'));
+users.forEach(function(user) {
+    console.log( user.name );
+}); // Вася, Маша, Петя
+
+users.sort(byField('age'));
+users.forEach(function(user) {
+    console.log( user.name );
+}); // Маша, Вася, Петя
+*/
+
+//Фильтрация через функцию
+/* .. ваш код для filter, inBetween, inArray */
+function myFilter(arr, func){
+ var arr_ = []; // массив, куда будем кидать элементы, удовлетворяющие func
+ for (i=0;i<arr.length;i++){
+     if (func( arr[i])) {arr_.push( arr[i]);}
+ }
+    return arr_;
+}
+
+var arr = [1, 2, 3, 4, 5, 6, 7];
+
+//console.log(myFilter(arr, function(a) { return a % 2 == 0 })); // 2,4,6
+
+function inBetween (a,b) {
+    return function(arr_i) {if (arr_i>=a && arr_i<=b) return 1; else return 0;}
+}
+//console.log( myFilter(arr, inBetween(3, 6)) ); // 3,4,5,6
+
+function inArray (arr1) {
+    return function(arr_i) { if (arr1.indexOf(arr_i) != -1) return 1; else return 0;}
+}
+//console.log( myFilter(arr, inArray([1, 2, 10])) ); // 1,2
+
+// Армия функций
+function makeArmy() {
+    var shooters = [], i;
+    for (i = 0; i < 10; i++) {
+        var shooter = new Function ('','console.log('+ i +' );');
+        shooters.push(shooter);
+    }
+    return shooters;
+}
+
+var army = makeArmy();
+
+army[0](); // стрелок выводит 10, а должен 0
+army[5](); // стрелок выводит 10...
+// .. все стрелки выводят 10 вместо 0,1,2...9
