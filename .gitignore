@@ -2,6 +2,10 @@
 Thumbs.db
 ehthumbs.db
 
+# WebStorm files
+.idea
+
+
 # Folder config file
 Desktop.ini
 
