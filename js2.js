@@ -30,8 +30,10 @@ function makeArmy() {
     for (i = 0; i < 10; i++) {
         var z = i;
         (function (k) {
+            var z2 = i;
             var shooter = function () {
                 console.log(z);
+                console.log(z2);
                 console.log(k);
                 console.log(shooter.savedValue);
             };
