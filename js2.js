@@ -27,14 +27,18 @@ myModule.foo();
 // two solutions of it:
 function makeArmy() {
     var shooters = [], i;
-    for (i = 0; i < 10; i++) (function (k) {
-        var shooter = function () {
-            console.log(k);
-            console.log(shooter.savedValue);
-        };
-        shooter.savedValue = i;
-        shooters.push(shooter);
-    })(i);
+    for (i = 0; i < 10; i++) {
+        var z = i;
+        (function (k) {
+            var shooter = function () {
+                console.log(z);
+                console.log(k);
+                console.log(shooter.savedValue);
+            };
+            shooter.savedValue = i;
+            shooters.push(shooter);
+        })(i);
+    }
     return shooters;
 }
 
