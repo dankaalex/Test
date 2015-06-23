@@ -688,6 +688,126 @@ function makeArmy() {
 
 var army = makeArmy();
 
-army[0](); // стрелок выводит 10, а должен 0
-army[5](); // стрелок выводит 10...
+//army[0](); // стрелок выводит 10, а должен 0
+//army[5](); // стрелок выводит 10...
 // .. все стрелки выводят 10 вместо 0,1,2...9
+
+
+// ************************************ Модули через замыкания ********************************
+// ************************************ Управление памятью в JavaScript ***********************
+// ************************************ Устаревшая конструкция «with» *************************
+
+// ************************************  Методы объектов, this ********************************
+
+//Создайте калькулятор
+var calculator = {
+    read: function () { this.a = 1; this.b = 2;}, // this.a = +prompt('Enter a',0)}; this.b = +prompt('Enter b',0);
+    sum: function () {console.log(this.a + this.b)},
+    mul: function () {console.log (this.a * this.b);}
+}
+
+//calculator.read();
+//calculator.sum();
+//calculator.mul();
+
+// Цепочка вызовов
+var ladder = {
+    step: 0,
+    up: function() { // вверх по лестнице
+        this.step++;
+        return this;
+         },
+    down: function() { // вниз по лестнице
+        this.step--;
+        return this;
+    },
+    showStep: function() { // вывести текущую ступеньку
+        console.log( this.step );
+    }
+};
+/*
+ladder.up();
+ladder.up();
+ladder.down();
+ladder.showStep(); // 1
+*/
+
+// ladder.up().up().down().up().showStep(); // 1
+
+
+// *************************** Преобразование объектов: toString и valueOf ***********************
+//Сумма произвольного количества скобок
+function sum1(a) {
+    var result = a;
+    return function sum2(b){
+        sum2.toString = function(){return result;};
+        result += b;
+        return sum2;
+    };
+
+}
+
+//var x = +sum1(1)(2)(4);
+//console.log(x);
+
+// *************************** Создание объектов через «new»  ***********************
+// Создать Calculator при помощи конструктора
+//function Calculator (){
+//    this.read = function() {this.a = 3; this.b = 4;};
+//    this.sum = function() {return this.a + this.b; };
+//    this.mul = function () {return this.a * this.b};
+//}
+//var calculator = new Calculator();
+//calculator.read();
+//console.log( "Сумма=" + calculator.sum() );
+//console.log( "Произведение=" + calculator.mul() );
+
+//Создать Accumulator при помощи конструктора
+//function  Accumulator (startingValue) {
+//    this.value = startingValue;
+//    this.read = function (){this.a = 3; this.value += this.a;}
+//}
+
+//var accumulator = new Accumulator(1); // начальное значение 1
+//accumulator.read(); // прибавит ввод prompt к текущему значению
+//accumulator.read(); // прибавит ввод prompt к текущему значению
+//console.log( accumulator.value ); // выведет текущее значение
+
+// Создайте калькулятор
+// step 1
+//function Calculator(){
+//    this.calculate = function (x) {
+//        var a, b, option;
+//        a = +x.substr(0, x.indexOf(' '));
+//        option =  x.substr(x.indexOf(' ')+1,1);
+//        b = +x.substr(x.indexOf(' ')+3);
+//        if (option == '+') return a + b;
+//        else if (option == '-') return a - b;
+//        else return null;
+//    }
+//}
+//var calc = new Calculator;
+//console.log(calc.calculate('3 - -77'));
+
+//step 2
+function Calculator(){
+    var options = [];
+    options ['+'] = function (a,b) {return a+b;}
+    options ['-'] = function (a,b) {return a-b;}
+
+    this.addMethod = function(name, func){ options[name] = func;}
+
+    this.calculate = function (x) {
+        var a, b, option;
+        a = +x.substr(0, x.indexOf(' '));
+        option =  x.substr(x.indexOf(' ')+1,1);
+        b = +x.substr(x.indexOf(' ')+3);
+        return options[option](a, b);
+    }
+
+}
+var powerCalc = new Calculator;
+powerCalc.addMethod('*', function(a, b) {return a * b;});
+powerCalc.addMethod('/', function(a, b) {return a / b;});
+console.log(powerCalc.calculate('2 + 3'));
+
