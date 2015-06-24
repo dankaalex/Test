@@ -806,8 +806,114 @@ function Calculator(){
     }
 
 }
-var powerCalc = new Calculator;
-powerCalc.addMethod('*', function(a, b) {return a * b;});
-powerCalc.addMethod('/', function(a, b) {return a / b;});
-console.log(powerCalc.calculate('2 + 3'));
+//var powerCalc = new Calculator;
+//powerCalc.addMethod('*', function(a, b) {return a * b;});
+//powerCalc.addMethod('/', function(a, b) {return a / b;});
+//console.log(powerCalc.calculate('2 + 3'));
+
+// *************************** Дескрипторы, геттеры и сеттеры свойств *********************
+// Добавить get/set-свойства
+function User1(fullName) {
+    this.fullName = fullName;
+
+    Object.defineProperty(this, 'firstName',{
+        get: function() {
+            var split = this.fullName.split(' ');
+            return split[0];
+        },
+        set: function(value) {
+            var split = this.fullName.split(' ');
+            this.fullName = value + ' ' + split[1];
+        }
+    });
+
+    Object.defineProperty(this, 'lastName',  {
+        get: function() {
+            var split = this.fullName.split(' ');
+            return split[1];
+        },
+        set: function(value) {
+            var split = this.fullName.split(' ');
+            this.fullName = split[0] + ' '+ value;
+        }
+    });
+}
+
+//var vasya = new User1("Василий Попкин");
+//
+//// чтение firstName/lastName
+//console.log( vasya.firstName ); // Василий
+//console.log( vasya.lastName ); // Попкин
+//
+//// запись в lastName
+//vasya.lastName = 'Сидоров';
+//vasya.firstName = 'Иван';
+//console.log( vasya.fullName ); // Василий Сидоров
+
+// ********************************** Статические и фабричные методы ****************************
+//Счетчик объектов
+function Article() {
+    this.created = new Date();
+    Article.count ++;
+    Article.ct = this.created;
+
+}
+
+Article.count = 0;
+Article.showStats = function() {
+    console.log ( this.count);
+    console.log ( this.ct);
+};
+
+//new Article();
+//new Article();
+//new Article();
+//Article.showStats();
+//new Article();
+//Article.showStats();
+
+//******************************** Явное указание this: «call», «apply» ******************************
+// Перепишите суммирование аргументов
+function sum(arr) {
+    return arr.reduce(function(a, b) {
+        return a + b;
+    });
+}
+console.log( sum([1, 2, 3]) ); // 6 (=1+2+3)
+
+function sumArgs() {
+    arguments.reduce = [].reduce;
+    var argStr = arguments.reduce(function(a, b) {
+        return a + b;
+    });
+    return argStr;
+}
+console.log( sumArgs(1, 2, 3, 4, 5) ); // 6, аргументы переданы через запятую, без массива
+
+// Примените функцию к аргументам
+function applyAll(){
+    arguments.func = arguments[0];
+    var arr = [], result;
+    for (i=1;i<arguments.length;i++) {arr.push(arguments[i]);}
+    result = arguments.func.apply(null,arr);
+    return result;
+
+}
+
+console.log( applyAll(Math.max, 2, -2, 3) ); // 3
+
+function sum() { // суммирует аргументы: sum(1,2,3) = 6
+    return [].reduce.call(arguments, function(a, b) {
+        return a + b;
+    });
+}
+
+function mul() { // перемножает аргументы: mul(2,3,4) = 24
+    return [].reduce.call(arguments, function(a, b) {
+        return a * b;
+    });
+}
+
+console.log( applyAll(sum, 1, 2, 3) ); // -> sum(1, 2, 3) = 6
+console.log( applyAll(mul, 2, 3, 4) ); // -> mul(2, 3, 4) = 24
 
