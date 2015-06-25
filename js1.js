@@ -873,47 +873,169 @@ Article.showStats = function() {
 //Article.showStats();
 
 //******************************** Явное указание this: «call», «apply» ******************************
-// Перепишите суммирование аргументов
-function sum(arr) {
-    return arr.reduce(function(a, b) {
-        return a + b;
-    });
+//// Перепишите суммирование аргументов
+//function sum(arr) {
+//    return arr.reduce(function(a, b) {
+//        return a + b;
+//    });
+//}
+//console.log( sum([1, 2, 3]) ); // 6 (=1+2+3)
+//
+//function sumArgs() {
+//    arguments.reduce = [].reduce;
+//    var argStr = arguments.reduce(function(a, b) {
+//        return a + b;
+//    });
+//    return argStr;
+//}
+//console.log( sumArgs(1, 2, 3, 4, 5) ); // 6, аргументы переданы через запятую, без массива
+//
+//// Примените функцию к аргументам
+//function applyAll(){
+//    arguments.func = arguments[0];
+//    var arr = [], result;
+//    for (i=1;i<arguments.length;i++) {arr.push(arguments[i]);}
+//    result = arguments.func.apply(null,arr);
+//    return result;
+//
+//}
+//
+//console.log( applyAll(Math.max, 2, -2, 3) ); // 3
+//
+//function sum() { // суммирует аргументы: sum(1,2,3) = 6
+//    return [].reduce.call(arguments, function(a, b) {
+//        return a + b;
+//    });
+//}
+//
+//function mul() { // перемножает аргументы: mul(2,3,4) = 24
+//    return [].reduce.call(arguments, function(a, b) {
+//        return a * b;
+//    });
+//}
+//
+//console.log( applyAll(sum, 1, 2, 3) ); // -> sum(1, 2, 3) = 6
+//console.log( applyAll(mul, 2, 3, 4) ); // -> mul(2, 3, 4) = 24
+
+// ******************************** Привязка контекста и карринг: «bind» ******************************
+//Запись в объект после bind
+//function f() {
+//    console.log( this );
+//}
+//var user = {
+//    g: f.bind("Hello")
+//}
+//user.g();
+
+//Повторный bind
+//function f() {
+//    console.log(this.name);
+//}
+//f = f.bind( {name: "Вася"} ).bind( {name: "Петя" } );
+//f();
+
+//Свойство функции после bind
+//function sayHi() {
+//    console.log( this.name );
+//}
+//sayHi.test = 5;
+//console.log( sayHi.test ); // 5
+//var bound = sayHi.bind({
+//    name: "Вася"
+//});
+//console.log( bound.test );
+
+////Использование функции вопросов
+//function ask(question, answer, ok, fail) {
+//    var result = '12345'; //prompt(question, '');
+//    if (result.toLowerCase() == answer.toLowerCase()) ok();
+//    else fail();
+//}
+//
+//var user = {
+//    login: 'Василий',
+//    password: '12345',
+//
+//    loginOk: function() {
+//        console.log( this.login + ' вошёл в сайт' );
+//    },
+//
+//    loginFail: function() {
+//        console.log( this.login + ': ошибка входа' );
+//    },
+//
+//    checkPassword: function() {
+//        ask("Ваш пароль?", this.password, this.loginOk.bind(this), this.loginFail.bind(this));
+//    }
+//};
+//
+//user.checkPassword();
+
+// ************************************** Функции-обёртки, декораторы ****************************************
+//function work(a) {
+//   /*  */ // work - произвольная функция, один аргумент
+//}
+//
+//function makeLogging(f, log) {
+//    return function() {
+//        log.push(arguments[0]);
+//        return f.apply(this,arguments);
+//    };
+//}
+//
+//var log = [];
+//work = makeLogging(work, log);
+//
+//work(1); // 1, добавлено в log
+//work(5); // 5, добавлено в log
+//for (var i = 0; i < log.length; i++) {
+//    console.log( 'Лог:' + log[i] ); // "Лог:1", затем "Лог:5"
+//}
+
+//Логирующий декоратор (много аргументов)
+function work(a, b) {
+    console.log( a + b ); // work - произвольная функция
 }
-console.log( sum([1, 2, 3]) ); // 6 (=1+2+3)
 
-function sumArgs() {
-    arguments.reduce = [].reduce;
-    var argStr = arguments.reduce(function(a, b) {
-        return a + b;
-    });
-    return argStr;
-}
-console.log( sumArgs(1, 2, 3, 4, 5) ); // 6, аргументы переданы через запятую, без массива
-
-// Примените функцию к аргументам
-function applyAll(){
-    arguments.func = arguments[0];
-    var arr = [], result;
-    for (i=1;i<arguments.length;i++) {arr.push(arguments[i]);}
-    result = arguments.func.apply(null,arr);
-    return result;
-
+function makeLogging(f, log) {
+    return function() {
+        arguments.join = [].join; // отдолжила метод join у [], т.к. у arguments его нет
+        log.push(arguments.join(','));
+        return f.apply(this, arguments);
+    };
 }
 
-console.log( applyAll(Math.max, 2, -2, 3) ); // 3
+var log = [];
+work = makeLogging(work, log);
 
-function sum() { // суммирует аргументы: sum(1,2,3) = 6
-    return [].reduce.call(arguments, function(a, b) {
-        return a + b;
-    });
+work(1, 2); // 3
+work(4, 5); // 9
+
+for (var i = 0; i < log.length; i++) {
+   console.log( 'Лог:' + log[i] ); // "Лог:1,2", "Лог:4,5"
 }
 
-function mul() { // перемножает аргументы: mul(2,3,4) = 24
-    return [].reduce.call(arguments, function(a, b) {
-        return a * b;
-    });
+// Кеширующий декоратор
+function f(x) {
+    return Math.random() * x; // random для удобства тестирования
 }
 
-console.log( applyAll(sum, 1, 2, 3) ); // -> sum(1, 2, 3) = 6
-console.log( applyAll(mul, 2, 3, 4) ); // -> mul(2, 3, 4) = 24
+function makeCaching(f) {
+    var result = []; // в массив собираем значения от x
+    function my(x) {
+        if (result[x]) {return result[x];} // если x-ный элемент массива уже существует - вернем его
+        else {result[x] = f.call(this,x); // если нет, кладем
+              return result[x];}
+    };
+    return my;
 
+}
+f = makeCaching(f);
+var a, b, c;
+a = f(1);
+b = f(1);
+console.log( a == b ); // true (значение закешировано)
+b = f(2);
+console.log( a == b ); // false, другой аргумент => другое значение
+c = f(1);
+console.log( a == c ); // true (значение закешировано)
