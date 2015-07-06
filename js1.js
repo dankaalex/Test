@@ -993,49 +993,364 @@ Article.showStats = function() {
 //}
 
 //Логирующий декоратор (много аргументов)
-function work(a, b) {
-    console.log( a + b ); // work - произвольная функция
-}
-
-function makeLogging(f, log) {
-    return function() {
-        arguments.join = [].join; // отдолжила метод join у [], т.к. у arguments его нет
-        log.push(arguments.join(','));
-        return f.apply(this, arguments);
-    };
-}
-
-var log = [];
-work = makeLogging(work, log);
-
-work(1, 2); // 3
-work(4, 5); // 9
-
-for (var i = 0; i < log.length; i++) {
-   console.log( 'Лог:' + log[i] ); // "Лог:1,2", "Лог:4,5"
-}
+//function work(a, b) {
+//    console.log( a + b ); // work - произвольная функция
+//}
+//
+//function makeLogging(f, log) {
+//    return function() {
+//        arguments.join = [].join; // отдолжила метод join у [], т.к. у arguments его нет
+//        log.push(arguments.join(','));
+//        return f.apply(this, arguments);
+//    };
+//}
+//
+//var log = [];
+//work = makeLogging(work, log);
+//
+//work(1, 2); // 3
+//work(4, 5); // 9
+//
+//for (var i = 0; i < log.length; i++) {
+//   console.log( 'Лог:' + log[i] ); // "Лог:1,2", "Лог:4,5"
+//}
 
 // Кеширующий декоратор
-function f(x) {
-    return Math.random() * x; // random для удобства тестирования
+//function f(x) {
+//    return Math.random() * x; // random для удобства тестирования
+//}
+//
+//function makeCaching(f) {
+//    var result = []; // в массив собираем значения от x
+//    function my(x) {
+//        if (result[x]) {return result[x];} // если x-ный элемент массива уже существует - вернем его
+//        else {result[x] = f.call(this,x); // если нет, кладем
+//              return result[x];}
+//    };
+//    return my;
+//
+//}
+//f = makeCaching(f);
+//var a, b, c;
+//a = f(1);
+//b = f(1);
+//console.log( a == b ); // true (значение закешировано)
+//b = f(2);
+//console.log( a == b ); // false, другой аргумент => другое значение
+//c = f(1);
+//console.log( a == c ); // true (значение закешировано)
+
+function formatDate(date) {
+ var toString = {}.toString;
+ var vType = (toString.call(date).slice(8, -1));
+
+    function formatDate(date) {
+        var dd = date.getDate();
+        if (dd < 10) dd = '0' + dd;
+        var mm = date.getMonth() + 1;
+        if (mm < 10) mm = '0' + mm;
+        var yy = date.getFullYear() % 100;
+        if (yy < 10) yy = '0' + yy;
+        return dd + '.' + mm + '.' + yy;
+    }
+
+    if (vType == 'String') { var dd = new Date(date);}
+    else if (vType == 'Number') { var dd = new Date(date*1000);}
+    else if (vType == 'Array') { var dd = new Date(date[0],date[1],date[2]);}
+    else if (vType == 'Date') { var dd = new Date(date);};
+    return (formatDate(dd));
+
 }
 
-function makeCaching(f) {
-    var result = []; // в массив собираем значения от x
-    function my(x) {
-        if (result[x]) {return result[x];} // если x-ный элемент массива уже существует - вернем его
-        else {result[x] = f.call(this,x); // если нет, кладем
-              return result[x];}
+//console.log( formatDate('2011-10-02') ); // 02.10.11
+//console.log( formatDate(1234567890) ); // 14.02.09
+//console.log( formatDate([2014, 0, 1]) ); // 01.01.14
+//console.log( formatDate(new Date(2014, 0, 1)) ); // 01.01.14
+
+// *********************************** Формат JSON, метод toJSON ***********************
+// Превратите объект в JSON
+
+//    var leader = {
+//        name: "Василий Иванович",
+//        age: 35
+//    };
+//var str = JSON.stringify(leader);
+//console.log (str);
+//leader = JSON.parse(str);
+//console.log (leader);
+
+//Превратите объекты со ссылками в JSON
+var leader = {
+    name: "Василий Иванович"
+};
+
+var soldier = {
+    name: "Петька"
+};
+
+// эти объекты ссылаются друг на друга!
+leader.soldier = soldier;
+soldier.leader = leader;
+
+var team = [leader, soldier];
+//var str = dojox.json.ref.toJson(team);
+//var str = JSON.stringify(team,myfunc,4);
+//console.log(str);
+//
+//function myfunc(key, value) {
+//    if (typeof value == "object" ) {
+//       return ///;
+//    }
+//    return typeof value;
+//}
+
+// ********************************* setTimeout и setInterval *********************************
+// Вывод чисел каждые 100мс
+function  printNumbersInterval() {
+    var i=0;
+    var id = setInterval(
+           function(){
+               console.log(i);
+               if (i < 20) {i++;}
+               else {clearInterval(id);}
+               },100);
+}
+// printNumbersInterval();
+
+// Вывод чисел каждые 100мс, через setTimeout
+function  printNumbersInterval1() {
+    var i=0;
+    var id = setTimeout(
+        function run(){
+            console.log(i);
+            if (i < 20) {i++; setTimeout(run,200);}
+            else {clearInterval(id);}
+        },200);
+}
+// printNumbersInterval1();
+
+// Функция-задержка
+//function f(x) {
+//    console.log( x );
+//}
+//
+//function delay(f, ms) {
+// return function(){
+//     var arg = arguments;
+//     var t = this;
+//     setTimeout(function(){f.apply(t,arg);}, ms);
+// };
+//}
+//
+//var f1000 = delay(f, 1000);
+//var f1500 = delay(f, 2000);
+//
+//f1000("тест",2); // выведет "тест" через 1000 миллисекунд
+//f1500("тест2"); // выведет "тест2" через 1500 миллисекунд
+
+// *********************************** Запуск кода из строки: eval ************************
+//Eval-калькулятор
+//function eval_calc(str) {
+//    return eval(str);
+//}
+//console.log(eval_calc('2+2'));
+
+// *********************************** Перехват ошибок, «try..catch» ***********************
+//Eval-калькулятор с ошибками
+//function eval_calc(str) {
+//    try {
+//        var result = eval(str);
+//        if (!result) {throw  new SyntaxError('Фигня какая то');}
+//        console.log(result);
+//    }
+//    catch (err) {
+//        console.log('Error!' + err.message);
+//    }
+//}
+//eval_calc('0/0');
+
+// ********************************* Внутренний и внешний интерфейс  *****************************
+function CoffeeMachine(power) {
+    this.waterAmount = 0;
+
+    var WATER_HEAT_CAPACITY = 4200;
+
+    var self = this;
+    var timerId;
+
+    function getBoilTime() {
+        return self.waterAmount * WATER_HEAT_CAPACITY * 80 / power;
+    }
+
+    function onReady() {
+        console.log( 'Кофе готов!' );
+    }
+
+    this.run = function() {
+        timerId = setTimeout(onReady, getBoilTime());
     };
-    return my;
+
+    this.stop = function() {
+        clearTimeout(timerId);
+    }
 
 }
-f = makeCaching(f);
-var a, b, c;
-a = f(1);
-b = f(1);
-console.log( a == b ); // true (значение закешировано)
-b = f(2);
-console.log( a == b ); // false, другой аргумент => другое значение
-c = f(1);
-console.log( a == c ); // true (значение закешировано)
+//
+//var coffeeMachine = new CoffeeMachine(50000);
+//coffeeMachine.waterAmount = 200;
+//
+//coffeeMachine.run();
+//coffeeMachine.stop(); // кофе приготовлен не будет
+
+// **************************** Геттеры и сеттеры ***************************
+// Написать объект с геттерами и сеттерами
+function User() {
+    var FirstName, Surname;
+   this.setFirstName = function(str) {
+       FirstName = str;
+   }
+    this.setSurname =  function(str) {
+        Surname = str;
+    }
+    this.getFullName = function() {
+        return (FirstName +' '+Surname);
+    }
+}
+
+//var user = new User();
+//user.setFirstName("Петя");
+//user.setSurname("Иванов");
+
+//console.log( user.getFullName() ); // Петя Иванов
+
+//Добавить геттер для power
+function CoffeeMachine(power, capacity) {
+    var waterAmount = 0;
+
+    this.setWaterAmount = function(amount) {
+        if (amount < 0) { throw new Error("Значение должно быть положительным");
+        }
+        if (amount > capacity) {
+            throw new Error("Нельзя залить воды больше, чем " + capacity);
+        }
+
+        waterAmount = amount;
+    };
+
+    this.getWaterAmount = function() {
+        return waterAmount;
+    };
+
+    this.getPower = function() {
+        return power;
+    }
+}
+
+//var coffeeMachine = new CoffeeMachine(1000, 500);
+//
+//coffeeMachine.setWaterAmount(450);
+//console.log( coffeeMachine.getWaterAmount() ); // 450
+//console.log( coffeeMachine.getPower() ); // 450
+
+// Добавить публичный метод кофеварке
+function CoffeeMachine(power, capacity) {
+    var waterAmount = 0;
+
+    var WATER_HEAT_CAPACITY = 4200;
+
+    function getTimeToBoil() {
+        return waterAmount * WATER_HEAT_CAPACITY * 80 / power;
+    }
+
+    this.setWaterAmount = function(amount) {
+
+        if (amount < 0) {throw new Error("Значение должно быть положительным");}
+        if (amount > capacity) {throw new Error("Нельзя залить больше, чем " + capacity);}
+
+        waterAmount = amount;
+    };
+
+    function onReady() {
+        console.log( 'Кофе готов!' );
+    }
+
+    this.run = function() {
+        setTimeout(onReady, getTimeToBoil());
+    };
+
+   this.addWater = function(amount){
+       try {
+           this.setWaterAmount(waterAmount + amount);
+       }
+       catch (err) {
+           console.log(err.message);
+       }
+       };
+
+}
+
+//var coffeeMachine = new CoffeeMachine(100000, 400);
+//coffeeMachine.addWater(200);
+//coffeeMachine.addWater(100);
+//coffeeMachine.addWater(300); // Нельзя залить больше, чем 400
+//coffeeMachine.run();
+
+//Создать сеттер для onReady
+function CoffeeMachine(power, capacity) {
+    var waterAmount = 0;
+    var WATER_HEAT_CAPACITY = 4200;
+    var isRunning = false;
+
+    function getTimeToBoil() {
+        return waterAmount * WATER_HEAT_CAPACITY * 80 / power;
+    }
+
+    this.setWaterAmount = function(amount) {
+        // ... проверки пропущены для краткости
+        waterAmount = amount;
+    };
+
+    this.getWaterAmount = function(amount) {
+        return waterAmount;
+    };
+
+    function onReady() {
+        console.log( 'Кофе готов!' );
+    }
+
+    this.run = function() {
+        isRunning = true;
+        setTimeout(function () {onReady();}, getTimeToBoil());
+    };
+
+    this.setOnReady = function(func) {
+        onReady = func;
+        isRunning = false;
+    }
+
+    this.isRunning = function() {return isRunning;}
+
+}
+
+//var coffeeMachine = new CoffeeMachine(20000, 500);
+//coffeeMachine.setWaterAmount(150);
+//
+//coffeeMachine.setOnReady(function() {var amount = coffeeMachine.getWaterAmount(); console.log( 'Готов кофе: ' + amount + 'мл' );});
+//
+//coffeeMachine.run();
+
+//Добавить метод isRunning
+
+var coffeeMachine = new CoffeeMachine(20000, 500);
+coffeeMachine.setWaterAmount(100);
+
+console.log( 'До: ' + coffeeMachine.isRunning()); // До: false
+
+coffeeMachine.run();
+console.log( 'В процессе: ' + coffeeMachine.isRunning() ); // В процессе: true
+
+coffeeMachine.setOnReady(function() {
+    console.log( "После: " + coffeeMachine.isRunning() ); // После: false
+});
+
+
