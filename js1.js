@@ -1528,23 +1528,96 @@ fridge.addFood({
     calories: 150
 });
 
-console.log( fridge.getFood());
-fridge.removeFood("нет такой еды"); //
-console.log( fridge.getFood().length ); // 3
-console.log( fridge.getFood());
+//console.log( fridge.getFood());
+//fridge.removeFood("нет такой еды"); //
+//console.log( fridge.getFood().length ); // 3
+//console.log( fridge.getFood());
+//
+//var dietItems = fridge.filterFood(function(item) {
+//    return item.calories < 50;
+//});
+//
+//console.log( dietItems);
+//dietItems.forEach(function(item) {
+//    console.log(item.title ); // сок, зелень
+//    fridge.removeFood(item.title);
+//});
+//console.log( fridge.getFood().length ); // 2
+//
+//var fridge = new Fridge(500);
+//fridge.enable();
+//fridge.addFood("кус-кус");
+//fridge.disable(); // ошибка, в холодильнике есть еда
 
-var dietItems = fridge.filterFood(function(item) {
-    return item.calories < 50;
-});
+// *********************** Прототип объекта **************************
+var head = {
+    glasses: 1
+};
 
-console.log( dietItems);
-dietItems.forEach(function(item) {
-    console.log(item.title ); // сок, зелень
-    fridge.removeFood(item.title);
-});
-console.log( fridge.getFood().length ); // 2
+var table = {
+    pen: 3
+};
 
-var fridge = new Fridge(500);
-fridge.enable();
-fridge.addFood("кус-кус");
-fridge.disable(); // ошибка, в холодильнике есть еда
+var bed = {
+    sheet: 1,
+    pillow: 2
+};
+
+var pockets = {
+    money: 2000
+};
+
+// pockets -> bed -> table -> head.
+// То есть pockets.pen == 3, bed.glasses == 1, но table.money == undefined.
+//pockets.__proto__ = bed;
+//bed.__proto__ = table;
+//table.__proto__= head;
+//console.log(pockets.pen);
+//console.log(bed.glasses);
+//console.log(table.money);
+
+// *************************************** Свойство F.prototype и создание объектов через new *************************
+function Rabbit(name) {
+    this.name = name;
+}
+Rabbit.prototype.sayHi = function() {
+    console.log( this.name );
+}
+//
+//var rabbit = new Rabbit("Rabbit");
+//
+//rabbit.sayHi();
+//Rabbit.prototype.sayHi();
+//Object.getPrototypeOf(rabbit).sayHi();
+//rabbit.__proto__.sayHi();
+
+// ***************************************** Встроенные «классы» в JavaScript ****************************
+// Добавить функциям defer
+//
+//function f() {
+//    console.log( "привет" );
+//}
+//
+//Function.prototype.defer = function (ms) {
+//     setTimeout(this, ms);
+//}
+//
+//f.defer(1000); // выведет "привет" через 1 секунду
+
+//Добавить функциям defer с аргументами
+function f(a, b) {
+    console.log( a + b );
+}
+
+Function.prototype.defer = function (ms) {
+    var self = this;
+    //console.log(self);
+    return function () {
+       var arg = arguments;
+        var self_ = this;
+        //console.log(arg);
+        //console.log(self_);
+        setTimeout(self.apply(self_,arg), ms);
+    };
+}
+f.defer(1000)(1,2); // выведет 3 через 1 секунду.
